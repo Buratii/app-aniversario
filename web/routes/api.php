@@ -3,17 +3,26 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+Route::namespace('API')->name('api.')->group(function(){
+    Route::prefix('/users')->group(function(){
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+
+        Route::get('/', 'UserController@index')->name('index_users');
+        Route::get('/{id}', 'UserController@show')->name('single_user');
+
+        Route::post('/register', 'UserController@store')->name('store_users');
+    });
+
+    Route::prefix('/birthdays')->group(function(){
+
+
+        Route::get('/', 'BirthdayController@index')->name('index_birthdays');
+        Route::get('/{id}', 'BirthdayController@show')->name('single_birthday');
+
+        Route::post('/birthdays', 'BirthdayController@store')->name('store_birthday');
+
+        Route::put('/update/{id}', 'BirthdayController@update')->name('update_birthdays');
+
+        Route::delete('/delete/{id}', 'BirthdayController@delete')->name('delete_birthdays');
+    });
 });
