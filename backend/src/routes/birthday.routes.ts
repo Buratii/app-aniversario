@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { getCustomRepository } from 'typeorm';
 import { parseISO } from 'date-fns';
 
 import BirthdaysRepository from '../repositories/BirthdaysRepository';
@@ -6,23 +7,27 @@ import CreateBirthdayService from '../services/CreateBirthdayService';
 
 const birthdaysRouter = Router();
 
-const birthdaysRepository = new BirthdaysRepository();
+birthdaysRouter.get('/', async (request, response) => {
+  const birthdaysRepository = getCustomRepository(BirthdaysRepository);
 
-birthdaysRouter.get('/', (request, response) => {
-  const birthdays = birthdaysRepository.all();
+  const birthdays = await birthdaysRepository.find();
 
   return response.json(birthdays);
 });
 
-birthdaysRouter.post('/', (request, response) => {
+birthdaysRouter.post('/', async (request, response) => {
   try {
     const { date, local, gift } = request.body;
 
     const parsedDate = parseISO(date);
 
-    const createBirthday = new CreateBirthdayService(birthdaysRepository);
+    const createBirthday = new CreateBirthdayService();
 
-    const birthday = createBirthday.execute({ date: parsedDate, local, gift });
+    const birthday = await createBirthday.execute({
+      date: parsedDate,
+      local,
+      gift,
+    });
 
     return response.json(birthday);
   } catch (error) {
